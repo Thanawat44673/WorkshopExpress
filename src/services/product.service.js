@@ -7,6 +7,7 @@ const getAllProducts = async () => {
     // 1. ค้นหาสินค้าที่ยังเปิดใช้งาน
     const products = await Product.find({
       isActive: true,
+      stock: { $gt: 0 },
     })
       .populate("owner", "username")
       .sort({ createdAt: -1 });
@@ -33,6 +34,7 @@ const getProductById = async (productId) => {
     const product = await Product.findOne({
       _id: productId,
       isActive: true,
+      stock: { $gt: 0 },
     }).populate("owner", "username");
 
     // 3. ตรวจสอบว่าพบสินค้าหรือไม่
@@ -105,6 +107,7 @@ const createProduct = async ({
       price: productPrice,
       stock: productStock,
       owner: ownerId,
+      isActive: productStock > 0,
     });
 
     // 7. ดึงข้อมูลเจ้าของสินค้า
@@ -227,6 +230,7 @@ const updateProduct = async (productId, updateData, currentUser) => {
       }
 
       product.stock = stock;
+      product.isActive = stock > 0;
     }
 
     //* 10. บันทึกข้อมูล
@@ -272,23 +276,13 @@ const deleteProduct = async (productId, currentUser) => {
       throw error;
     }
 
-    // 4. ตรวจสอบว่าสินค้าถูกลบไปแล้วหรือยัง
-    if (!product.isActive) {
-      const error = new Error("สินค้านี้ถูกลบไปแล้ว");
-      error.statusCode = 409;
-      throw error;
-    }
+    // 4. ลบสินค้าออกจากฐานข้อมูลจริง
+    await product.deleteOne();
 
-    // 5. Soft Delete
-    product.isActive = false;
-
-    await product.save();
-
-    // 6. ส่งข้อมูลกลับ
+    // 5. ส่งข้อมูลกลับ
     return {
       id: product._id,
       name: product.name,
-      isActive: product.isActive,
     };
 
   } catch (error) {

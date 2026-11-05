@@ -109,6 +109,7 @@ const createOrder = async (productId, quantity, buyerId) => {
         const product = await Product.findOne({
             _id: productId,
             isActive: true,
+            stock: { $gt: 0 },
         });
 
         if (!product) {
@@ -131,9 +132,19 @@ const createOrder = async (productId, quantity, buyerId) => {
                 isActive: true,
                 stock: { $gte: orderQuantity },
             },
-            {
-                $inc: { stock: -orderQuantity },
-            },
+            [
+                {
+                    $set: {
+                        stock: { $subtract: ["$stock", orderQuantity] },
+                        isActive: {
+                            $gt: [
+                                { $subtract: ["$stock", orderQuantity] },
+                                0,
+                            ],
+                        },
+                    },
+                },
+            ],
             {
                 new: true,
             }
@@ -166,7 +177,10 @@ const createOrder = async (productId, quantity, buyerId) => {
             //* หากสร้าง Order ไม่สำเร็จ ให้คืน Stock กลับ
             await Product.updateOne(
                 { _id: productId },
-                { $inc: { stock: orderQuantity } }
+                {
+                    $inc: { stock: orderQuantity },
+                    $set: { isActive: true },
+                }
             );
 
             throw error;

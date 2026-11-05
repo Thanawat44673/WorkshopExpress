@@ -1,4 +1,14 @@
 const productService = require("../services/product.service");
+const {
+  replaceProductImage,
+  removeProductImages,
+} = require("../services/product-image.service");
+
+const serializeProduct = (product) => {
+  const result = product.toObject();
+  delete result.image;
+  return result;
+};
 
 // GET All Products
 const getAllProducts = async (req, res) => {
@@ -9,7 +19,7 @@ const getAllProducts = async (req, res) => {
       status: 200,
       message: "Product list retrieved successfully",
       data: {
-        products,
+        products: products.map(serializeProduct),
       }
     });
 
@@ -36,7 +46,7 @@ const getProductById = async (req, res) => {
       status: 200,
       message: "Product list retrieved successfully",
       data: {
-        product,
+        product: serializeProduct(product),
       }
     });
 
@@ -58,9 +68,6 @@ const createProduct = async (req, res) => {
     //* รับข้อมูลจาก Request Body
     const { name, description, price, stock } = req.body;
 
-    //* รับไฟล์รูปภาพจาก Multer
-    const image = req.file ? req.file.path : null;
-
     //* ใช้ ID จาก JWT ไม่รับ owner จาก Client
     const ownerId = req.user.id;
 
@@ -69,15 +76,16 @@ const createProduct = async (req, res) => {
       description,
       price,
       stock,
-      image,
       ownerId,
     });
+
+    await replaceProductImage(product._id, req.file?.path);
 
     return res.status(201).json({
       status: 201,
       message: "Product added successfully",
       data: {
-        product,
+        product: serializeProduct(product),
       }
     });
 
@@ -113,11 +121,13 @@ const updateProduct = async (req, res) => {
       currentUser
     );
 
+    await replaceProductImage(product._id, req.file?.path);
+
     return res.status(200).json({
       status: 200,
       message: "Product edit successfully",
       data: {
-        product,
+        product: serializeProduct(product),
       }
     });
 
@@ -148,6 +158,12 @@ const deleteProduct = async (req, res) => {
       id,
       currentUser
     );
+
+    try {
+      await removeProductImages(product.id);
+    } catch (error) {
+      console.error("Product image cleanup failed:", error);
+    }
 
     return res.status(200).json({
       status: 200,
