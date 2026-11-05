@@ -7,12 +7,16 @@ const registerUser = async ({ username, password }) => {
   try {
     // 1. ตรวจสอบข้อมูลที่จำเป็น
     if (!username || !password) {
-      throw new Error("กรุณากรอกข้อมูลให้ครบถ้วน");
+      const error = new Error("กรุณากรอกข้อมูลให้ครบถ้วน");
+      error.statusCode = 400;
+      throw error;
     }
 
     // 2. ตรวจสอบความยาวรหัสผ่าน
     if (password.length < 8) {
-      throw new Error("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+      const error = new Error("รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร");
+      error.statusCode = 400;
+      throw error;
     }
 
     // 3. ตรวจสอบ username และ email ซ้ำ
@@ -21,7 +25,9 @@ const registerUser = async ({ username, password }) => {
     });
 
     if (existingUser) {
-      throw new Error("Username นี้ถูกใช้งานแล้ว");
+      const error = new Error("Username นี้ถูกใช้งานแล้ว");
+      error.statusCode = 409;
+      throw error;
     }
 
     // 4. เข้ารหัสรหัสผ่าน
@@ -95,7 +101,9 @@ const loginUser = async ({ username, password }) => {
 
     // 5. ตรวจสอบ JWT Secret
     if (!process.env.JWT_SECRET) {
-      throw new Error("ไม่พบ JWT_SECRET ใน Environment Variables");
+      const error =  new Error("ไม่พบ JWT_SECRET ใน Environment Variables");
+      error.statusCode = 401;
+      throw error;
     }
 
     // 6. สร้าง JWT Token

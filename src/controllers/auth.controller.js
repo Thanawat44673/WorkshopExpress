@@ -14,18 +14,21 @@ const register = async (req, res, next) => {
 
     // 3. ส่ง Response เมื่อสมัครสมาชิกสำเร็จ
     return res.status(201).json({
-      success: true,
-      message: "สมัครสมาชิกสำเร็จ กรุณารอ Admin อนุมัติ",
-      data: newUser,
+      status: 201,
+      message: "create success",
+      data: {
+        newUser,
+      }
     });
 
   } catch (error) {
     // 4. จัดการ Error
-    console.error("Register Error:", error);
+    // console.error("Register Error:", error);
 
-    return res.status(400).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการสมัครสมาชิก",
+    return res.status(error.statusCode || 500).json({
+      status: error.statusCode || 500,
+      message: error.message, 
+      data: {}
     });
   }
 };
@@ -38,25 +41,26 @@ const login = async (req, res) => {
     const { username, password } = req.body;
 
     // 2. เรียกใช้งาน Auth Service
-    const result = await authService.loginUser({
+    const data = await authService.loginUser({
       username,
       password,
     });
 
     // 3. ส่ง Response เมื่อเข้าสู่ระบบสำเร็จ
-    return res.status(200).json({
-      success: true,
-      message: "เข้าสู่ระบบสำเร็จ",
-      data: result,
+    return res.status(201).json({
+      status: 201,
+      message: "login success",
+      data
     });
 
   } catch (error) {
     // 4. จัดการ Error
-    console.error("Login Error:", error);
+    // console.error("Login Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+      status: error.statusCode || 500,
+      message: error.message, 
+      data: {}
     });
   }
 };

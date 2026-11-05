@@ -8,8 +8,9 @@ const authenticate = async (req, res, next) => {
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({
-        success: false,
+        status: 401,
         message: "กรุณาเข้าสู่ระบบก่อนใช้งาน",
+        data: {}
       });
     }
 
@@ -27,16 +28,18 @@ const authenticate = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({
-        success: false,
+        status: 401,
         message: "ไม่พบข้อมูลผู้ใช้งาน",
+        data: {}
       });
     }
 
     // 5. ตรวจสอบสถานะการอนุมัติอีกครั้ง
     if (user.approvalStatus !== "approved") {
       return res.status(403).json({
-        success: false,
+        status: 403,
         message: "บัญชีของคุณไม่ได้รับอนุญาตให้ใช้งาน",
+        data: {}
       });
     }
 
@@ -52,27 +55,30 @@ const authenticate = async (req, res, next) => {
     next();
 
   } catch (error) {
-    console.error("Authentication Error:", error);
+    // console.error("Authentication Error:", error);
 
     // Token หมดอายุ
     if (error.name === "TokenExpiredError") {
       return res.status(401).json({
-        success: false,
+        status: 401,
         message: "Token หมดอายุ กรุณาเข้าสู่ระบบใหม่",
+        data: {}
       });
     }
 
     // Token ไม่ถูกต้อง
     if (error.name === "JsonWebTokenError") {
       return res.status(401).json({
-        success: false,
+        status: 401,
         message: "Token ไม่ถูกต้อง",
+        data: {}
       });
     }
 
     return res.status(500).json({
-      success: false,
+      status: 500,
       message: "เกิดข้อผิดพลาดในการตรวจสอบสิทธิ์",
+      data: {}
     });
   }
 };
