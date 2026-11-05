@@ -9,26 +9,17 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-
     password: {
       type: String,
       required: true,
       minlength: 8,
-      maxlength: 20,
       select: false,
     },
 
     role: {
         type: String,
-        enum: ["owner", "admin"],
-        default: "owner",
+        enum: ["user", "owner", "admin"],
+        default: "user",
     },
 
     approvalStatus: {
