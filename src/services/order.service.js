@@ -147,6 +147,7 @@ const createOrder = async (productId, quantity, buyerId) => {
             ],
             {
                 new: true,
+                updatePipeline: true,
             }
         );
 
