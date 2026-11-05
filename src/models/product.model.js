@@ -35,12 +35,6 @@ const productSchema = new mongoose.Schema(
             },
         },
 
-        // ตำแหน่งไฟล์รูปภาพ
-        image: {
-            type: String,
-            default: null,
-        },
-
         // เจ้าของสินค้า
         owner: {
             type: mongoose.Schema.Types.ObjectId,

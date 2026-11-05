@@ -56,7 +56,6 @@ const createProduct = async ({
   price,
   stock,
   ownerId,
-  image,
 }) => {
   try {
     // 1. ตรวจสอบข้อมูลที่จำเป็น
@@ -106,7 +105,6 @@ const createProduct = async ({
       price: productPrice,
       stock: productStock,
       owner: ownerId,
-      image: image || null,
     });
 
     // 7. ดึงข้อมูลเจ้าของสินค้า
@@ -157,7 +155,6 @@ const updateProduct = async (productId, updateData, currentUser) => {
       "description",
       "price",
       "stock",
-      "image",
     ];
 
     const fields = Object.keys(updateData);
@@ -232,15 +229,10 @@ const updateProduct = async (productId, updateData, currentUser) => {
       product.stock = stock;
     }
 
-    //* 10. ตรวจสอบและเปลี่ยนรูปภาพ
-    if (updateData.image !== undefined) {
-      product.image = updateData.image;
-    }
-
-    //* 11. บันทึกข้อมูล
+    //* 10. บันทึกข้อมูล
     await product.save();
 
-    //* 12. ดึงข้อมูลเจ้าของสินค้า
+    //* 11. ดึงข้อมูลเจ้าของสินค้า
     await product.populate("owner", "username");
 
     return product;

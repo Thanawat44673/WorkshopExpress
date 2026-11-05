@@ -72,7 +72,7 @@ const getAllOrders = async (currentUser) => {
         const orders = await Order.find(filter)
             .populate("buyer", "username")
             .populate("owner", "username")
-            .populate("product", "name image")
+            .populate("product", "name")
             .sort({ createdAt: -1 });
 
         //* 5. ส่งข้อมูล Order กลับ
