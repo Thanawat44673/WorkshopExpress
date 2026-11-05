@@ -14,11 +14,12 @@ const getPendingUsers = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Get Pending Users Error:", error);
+    // console.error("Get Pending Users Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "ไม่สามารถดึงรายชื่อสมาชิกได้",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -40,11 +41,12 @@ const approveUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Approve User Error:", error);
+    // console.error("Approve User Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "ไม่สามารถอนุมัติสมาชิกได้",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -66,11 +68,12 @@ const rejectUser = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Reject User Error:", error);
+    // console.error("Reject User Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "ไม่สามารถปฏิเสธสมาชิกได้",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };

@@ -27,7 +27,7 @@ const register = async (req, res, next) => {
 
     return res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,
-      message: error.message, 
+      message: error.message || "Internal server error", 
       data: {}
     });
   }
@@ -59,7 +59,7 @@ const login = async (req, res) => {
 
     return res.status(error.statusCode || 500).json({
       status: error.statusCode || 500,
-      message: error.message, 
+      message: error.message || "Internal server error", 
       data: {}
     });
   }

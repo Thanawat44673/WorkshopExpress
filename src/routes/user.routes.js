@@ -1,37 +1,33 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  getPendingUsers,
-  approveUser,
-  rejectUser,
-} = require("../controllers/user.controller");
+const userRouter = require("../controllers/user.controller");
 
 const { authenticate } = require("../middlewares/auth.middleware");
-const { authorizeAdmin } = require("../middlewares/admin.middleware");
+const { authorizeRoles } = require("../middlewares/role.middleware");
 
 // ดูรายชื่อสมาชิกที่รออนุมัติ
 router.get(
   "/pending",
   authenticate,
-  authorizeAdmin,
-  getPendingUsers
+  authorizeRoles("admin"),
+  userRouter.getPendingUsers
 );
 
 // อนุมัติสมาชิก
 router.put(
   "/:id/approve",
   authenticate,
-  authorizeAdmin,
-  approveUser
+  authorizeRoles("admin"),
+  userRouter.approveUser
 );
 
 // ปฏิเสธสมาชิก
 router.put(
   "/:id/reject",
   authenticate,
-  authorizeAdmin,
-  rejectUser
+  authorizeRoles("admin"),
+  userRouter.rejectUser
 );
 
 module.exports = router;

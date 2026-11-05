@@ -7,9 +7,7 @@ const productController = require("../controllers/product.controller");
 
 // Middlewares
 const { authenticate } = require("../middlewares/auth.middleware");
-const {
-  authorizeOwnerOrAdmin,
-} = require("../middlewares/role.middleware");
+const { authorizeRoles } = require("../middlewares/role.middleware");
 
 // ========================================
 // Product Routes
@@ -33,7 +31,7 @@ router.get(
 router.post(
   "/",
   authenticate,
-  authorizeOwnerOrAdmin,
+  authorizeRoles("owner", "admin"),
   upload.single("image"),
   productController.createProduct
 );
@@ -42,7 +40,7 @@ router.post(
 router.put(
   "/:id",
   authenticate,
-  authorizeOwnerOrAdmin,
+  authorizeRoles("owner", "admin"),
   upload.single("image"),
   productController.updateProduct
 );
@@ -51,7 +49,7 @@ router.put(
 router.delete(
   "/:id",
   authenticate,
-  authorizeOwnerOrAdmin,
+  authorizeRoles("owner", "admin"),
   productController.deleteProduct
 );
 

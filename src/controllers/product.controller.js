@@ -1,4 +1,3 @@
-
 const productService = require("../services/product.service");
 
 // GET All Products
@@ -7,17 +6,20 @@ const getAllProducts = async (req, res) => {
     const products = await productService.getAllProducts();
 
     return res.status(200).json({
-      success: true,
-      message: "ดึงรายการสินค้าสำเร็จ",
-      data: products,
+      status: 200,
+      message: "Product list retrieved successfully",
+      data: {
+        products,
+      }
     });
 
   } catch (error) {
-    console.error("Get All Products Error:", error);
+    // console.error("Get All Products Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการดึงสินค้า",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -31,17 +33,20 @@ const getProductById = async (req, res) => {
     const product = await productService.getProductById(id);
 
     return res.status(200).json({
-      success: true,
-      message: "ดึงรายละเอียดสินค้าสำเร็จ",
-      data: product,
+      status: 200,
+      message: "Product list retrieved successfully",
+      data: {
+        product,
+      }
     });
 
   } catch (error) {
-    console.error("Get Product By ID Error:", error);
+    // console.error("Get Product By ID Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการดึงสินค้า",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -69,17 +74,20 @@ const createProduct = async (req, res) => {
     });
 
     return res.status(201).json({
-      success: true,
-      message: "เพิ่มสินค้าสำเร็จ",
-      data: product,
+      status: 201,
+      message: "Product added successfully",
+      data: {
+        product,
+      }
     });
 
   } catch (error) {
-    console.error("Create Product Error:", error);
+    // console.error("Create Product Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการเพิ่มสินค้า",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -106,17 +114,20 @@ const updateProduct = async (req, res) => {
     );
 
     return res.status(200).json({
-      success: true,
-      message: "แก้ไขสินค้าสำเร็จ",
-      data: product,
+      status: 200,
+      message: "Product edit successfully",
+      data: {
+        product,
+      }
     });
 
   } catch (error) {
-    console.error("Update Product Error:", error);
+    // console.error("Update Product Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการแก้ไขสินค้า",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
@@ -139,17 +150,20 @@ const deleteProduct = async (req, res) => {
     );
 
     return res.status(200).json({
-      success: true,
-      message: "ลบสินค้าสำเร็จ",
-      data: product,
+      status: 200,
+      message: "Product delete successfully",
+      data: {
+        product,
+      }
     });
 
   } catch (error) {
-    console.error("Delete Product Error:", error);
+    // console.error("Delete Product Error:", error);
 
     return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message || "เกิดข้อผิดพลาดในการลบสินค้า",
+      status: error.statusCode || 500,
+      message: error.message || "Internal server error", 
+      data: {}
     });
   }
 };
