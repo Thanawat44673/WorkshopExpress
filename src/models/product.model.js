@@ -24,14 +24,14 @@ const productSchema = new mongoose.Schema(
             min: 0,
         },
 
-        // จำนวนสินค้าในคลัง
+        //* จำนวนสินค้าในคลัง
         stock: {
             type: Number,
             required: true,
             min: 0,
             validate: {
-                validator: Number.isInteger,
-                message: "Stock must be an integer",
+                validator: Number.isSafeInteger,
+                message: "Stock must be a safe integer",
             },
         },
 
