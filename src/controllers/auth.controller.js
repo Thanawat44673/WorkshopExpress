@@ -30,6 +30,39 @@ const register = async (req, res, next) => {
   }
 };
 
+
+// Login Controller
+const login = async (req, res) => {
+  try {
+    // 1. รับข้อมูลจาก Request Body
+    const { username, password } = req.body;
+
+    // 2. เรียกใช้งาน Auth Service
+    const result = await authService.loginUser({
+      username,
+      password,
+    });
+
+    // 3. ส่ง Response เมื่อเข้าสู่ระบบสำเร็จ
+    return res.status(200).json({
+      success: true,
+      message: "เข้าสู่ระบบสำเร็จ",
+      data: result,
+    });
+
+  } catch (error) {
+    // 4. จัดการ Error
+    console.error("Login Error:", error);
+
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ",
+    });
+  }
+};
+
+
 module.exports = {
   register,
+  login
 };
