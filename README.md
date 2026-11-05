@@ -58,7 +58,7 @@ npm start
 Authorization: Bearer <token>
 ```
 
-บทบาทที่ระบบรองรับคือ `user`, `owner` และ `admin` ผู้สมัครใหม่จะมีสถานะ `pending` และ role `user` จึงต้องให้ Admin อนุมัติก่อนใช้งาน endpoint ที่ป้องกันไว้ การเพิ่มสินค้าและจัดการสมาชิกต้องใช้ Admin หรือ Owner ตาม endpoint ส่วนการสร้างบัญชี/กำหนด role Admin ไม่มี endpoint ใน API ปัจจุบัน จึงต้องเตรียมบัญชี Admin ในฐานข้อมูลก่อน
+บทบาทที่ระบบรองรับคือ `user`, `owner` และ `admin` ผู้สมัครใหม่จะมีสถานะ `pending` และ role `user` เมื่อ Admin อนุมัติ บัญชีจะเปลี่ยนสถานะเป็น `approved` และ role เป็น `owner`; หาก Admin ปฏิเสธ role จะยังเป็น `user` การเพิ่มสินค้าและจัดการสมาชิกต้องใช้ Admin หรือ Owner ตาม endpoint ส่วนบัญชี Admin ต้องเตรียมไว้ในฐานข้อมูลก่อน
 
 ## API Endpoints
 
@@ -72,7 +72,7 @@ Authorization: Bearer <token>
 | `POST` | `/login` | สาธารณะ | เข้าสู่ระบบและรับ JWT |
 | `GET` | `/test-auth` | เข้าสู่ระบบ | ทดสอบ token และดูข้อมูลผู้ใช้ปัจจุบัน |
 | `GET` | `/users/pending` | Admin | ดูบัญชีที่รออนุมัติ |
-| `PUT` | `/users/:id/approve` | Admin | อนุมัติบัญชี |
+| `PUT` | `/users/:id/approve` | Admin | อนุมัติบัญชีและเปลี่ยน role เป็น `owner` |
 | `PUT` | `/users/:id/reject` | Admin | ปฏิเสธบัญชี |
 
 ตัวอย่าง body สมัคร/เข้าสู่ระบบ:

@@ -50,8 +50,12 @@ const updateUserApproval = async (userId, approvalStatus) => {
       throw error;
     }
 
-    // 5. อัปเดตสถานะ
+    // 5. อัปเดตสถานะและกำหนด role ให้สมาชิกที่ได้รับอนุมัติเป็น Owner
     user.approvalStatus = approvalStatus;
+    if (approvalStatus === "approved") {
+      user.role = "owner";
+    }
+    
     await user.save();
 
     // 6. ส่งข้อมูลกลับ
