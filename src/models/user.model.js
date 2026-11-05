@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
@@ -22,13 +21,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       minlength: 8,
+      maxlength: 20,
       select: false,
     },
 
     role: {
         type: String,
         enum: ["owner", "admin"],
-        default: "admin",
+        default: "owner",
     },
 
     approvalStatus: {
