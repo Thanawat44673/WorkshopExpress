@@ -38,14 +38,14 @@ const orderSchema = new mongoose.Schema(
             min: 0,
         },
 
-        // จำนวนสินค้าที่สั่งซื้อ
+        //* จำนวนสินค้าที่สั่งซื้อ
         quantity: {
             type: Number,
             required: true,
             min: 1,
             validate: {
-                validator: Number.isInteger,
-                message: "Quantity must be an integer",
+                validator: Number.isSafeInteger,
+                message: "Quantity must be a safe integer",
             },
         },
 
