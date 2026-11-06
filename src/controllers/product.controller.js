@@ -87,7 +87,7 @@ const createProduct = async (req, res) => {
       ownerId,
     });
 
-    await replaceProductImage(product._id, req.file?.path);
+    await replaceProductImage(product._id, req.file);
 
     return res.status(201).json({
       status: 201,
@@ -129,7 +129,7 @@ const updateProduct = async (req, res) => {
       currentUser
     );
 
-    await replaceProductImage(product._id, req.file?.path);
+    await replaceProductImage(product._id, req.file);
 
     return res.status(200).json({
       status: 200,
