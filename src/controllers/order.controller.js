@@ -13,22 +13,31 @@ const getProductOrders = async (req, res) => {
         };
 
         //* 3. ส่งข้อมูลไปให้ Service
-        const orders = await orderService.getProductOrders(
+        const order = await orderService.getProductOrders(
             id,
             currentUser
         );
 
+        if (order.length === 0) {
+            return res.status(404).json({
+                status: 404,
+                message: "No orders found for this product",
+                data: []
+            });
+        }
+
         //* 4. ส่ง Response กลับไปยัง Client
         return res.status(200).json({
-            success: true,
-            message: "ดึงรายการคำสั่งซื้อสำเร็จ",
-            data: orders,
+            status: 200,
+            message: "Get order successfully",
+            data: order
         });
 
     } catch (error) {
         return res.status(error.statusCode || 500).json({
-            success: false,
-            message: error.message,
+            status: error.statusCode || 500,
+            message: error.message || "Internal server error", 
+            data: {}
         });
     }
 };
@@ -54,15 +63,16 @@ const createOrder = async (req, res) => {
 
         //* 5. ส่ง Response กลับไปยัง Client
         return res.status(201).json({
-            success: true,
-            message: "สร้างคำสั่งซื้อสำเร็จ",
-            data: order,
+            status: 201,
+            message: "Create order successfully",
+            data: order
         });
 
     } catch (error) {
         return res.status(error.statusCode || 500).json({
-            success: false,
-            message: error.message,
+            status: error.statusCode || 500,
+            message: error.message || "Internal server error", 
+            data: {}
         });
     }
 };
@@ -79,16 +89,26 @@ const getAllOrders = async (req, res) => {
     // เรียกใช้งาน Service
     const orders = await orderService.getAllOrders(currentUser);
 
+    if (orders.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "No orders found",
+        data: []
+      });
+    }
+
     return res.status(200).json({
-      status: 200,
-      message: "Get all orders successfully",
-      data: orders,
+            status: 200,
+            message: "Get all orders successfully",
+            data: orders
     });
+
   } catch (error) {
-    return res.status(error.statusCode || 500).json({
-      status: error.statusCode || 500,
-      message: error.message || "Internal server error",
-    });
+        return res.status(error.statusCode || 500).json({
+            status: error.statusCode || 500,
+            message: error.message || "Internal server error", 
+            data: {}
+        });
   }
 };
 

@@ -15,6 +15,14 @@ const getAllProducts = async (req, res) => {
   try {
     const products = await productService.getAllProducts();
 
+    if (products.length === 0) {
+      return res.status(404).json({
+        status: 404,
+        message: "No products found",
+        data: { products: [] }
+      });
+    }
+
     return res.status(200).json({
       status: 200,
       message: "Product list retrieved successfully",
