@@ -19,7 +19,7 @@ const registerUser = async ({ username, password }) => {
       throw error;
     }
 
-    // 3. ตรวจสอบ username และ email ซ้ำ
+    // 3. ตรวจสอบ usernameซ้ำ
     const existingUser = await User.findOne({
         username: username.trim()
     });

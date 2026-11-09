@@ -29,6 +29,7 @@ const productSchema = new mongoose.Schema(
             required: true,
             min: 0,
             validate: {
+                // ใช้ตรวจว่า value เป็นจำนวนเต็มที่ js แทนค่าได้อย่างแม่นยำหรือไม่
                 validator: Number.isSafeInteger,
                 message: "Stock must be a safe integer",
             },

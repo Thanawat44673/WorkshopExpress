@@ -19,7 +19,7 @@ const getAllProducts = async (req, res) => {
       return res.status(404).json({
         status: 404,
         message: "No products found",
-        data: { products: [] }
+        data: { }
       });
     }
 
