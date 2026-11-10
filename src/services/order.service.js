@@ -2,6 +2,15 @@ const mongoose = require("mongoose");
 const Product = require("../models/product.model");
 const Order = require("../models/order.model");
 
+const useCurrentProductName = (orders) => {
+    for (const order of orders) {
+        if (order.product && typeof order.product === "object" && order.product.name) {
+            order.productName = order.product.name;
+        }
+    }
+    return orders;
+};
+
 // * ดึงรายการ Order ของสินค้า
 const getProductOrders = async (productId, currentUser) => {
     try {
@@ -38,10 +47,11 @@ const getProductOrders = async (productId, currentUser) => {
             product: productId,
         })
             .populate("buyer", "username")
+            .populate("product", "name")
             .sort({ createdAt: -1 });
 
         //* 5. ส่งข้อมูล Order กลับ
-        return orders;
+        return useCurrentProductName(orders);
 
     } catch (error) {
         throw error;
@@ -72,7 +82,7 @@ const getAllOrders = async (currentUser) => {
             .sort({ createdAt: -1 });
 
         //* 5. ส่งข้อมูล Order กลับ
-        return orders;
+        return useCurrentProductName(orders);
 
     } catch (error) {
         throw error;
@@ -114,14 +124,7 @@ const createOrder = async (productId, quantity, buyerId) => {
             throw error;
         }
 
-        //* 4. ตรวจสอบว่าไม่ได้สั่งซื้อสินค้าของตัวเอง
-        if (product.owner.toString() === buyerId.toString()) {
-            const error = new Error("ไม่สามารถสั่งซื้อสินค้าของตัวเองได้");
-            error.statusCode = 403;
-            throw error;
-        }
-
-        //* 5. ตรวจสอบและลด Stock อย่างปลอดภัย
+        //* 4. ตรวจสอบและลด Stock อย่างปลอดภัย
         const updatedProduct = await Product.findOneAndUpdate(
             {
                 _id: productId,
@@ -153,10 +156,10 @@ const createOrder = async (productId, quantity, buyerId) => {
             throw error;
         }
 
-        //* 6. คำนวณราคารวมจากราคาสินค้าใน Database
+        //* 5. คำนวณราคารวมจากราคาสินค้าใน Database
         const totalPrice = product.price * orderQuantity;
 
-        //* 7. สร้าง Order
+        //* 6. สร้าง Order
         try {
             const order = await Order.create({
                 buyer: buyerId,

@@ -1,6 +1,7 @@
 const fs = require("fs/promises");
 const path = require("path");
 const crypto = require("crypto");
+const Product = require("../models/product.model");
 
 const uploadDir = path.join(__dirname, "../uploads/products");
 
@@ -47,6 +48,26 @@ const replaceProductImage = async (productId, uploadedFile) => {
       )
       .map((entry) => fs.unlink(path.join(uploadDir, entry.name)))
   );
+
+  const imagePath = `/uploads/products/${fileName}`;
+  await Product.updateOne({ _id: productId }, { $set: { image: imagePath } });
+  return imagePath;
+};
+
+const getProductImagePath = async (product) => {
+  if (product.image) return product.image;
+
+  // Older uploads predate the image field, so discover their existing file.
+  try {
+    const entries = await fs.readdir(uploadDir, { withFileTypes: true });
+    const image = entries.find(
+      (entry) => entry.isFile() && entry.name.startsWith(`${product._id}.`)
+    );
+    return image ? `/uploads/products/${image.name}` : null;
+  } catch (error) {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  }
 };
 
 const removeProductImages = async (productId) => {
@@ -62,5 +83,6 @@ const removeProductImages = async (productId) => {
 
 module.exports = {
   replaceProductImage,
+  getProductImagePath,
   removeProductImages,
 };

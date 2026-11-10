@@ -35,6 +35,12 @@ const productSchema = new mongoose.Schema(
             },
         },
 
+        // Public path to the product image, if one has been uploaded.
+        image: {
+            type: String,
+            default: null,
+        },
+
         // เจ้าของสินค้า
         owner: {
             type: mongoose.Schema.Types.ObjectId,

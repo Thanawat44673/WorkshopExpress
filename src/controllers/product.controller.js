@@ -1,12 +1,17 @@
 const productService = require("../services/product.service");
 const {
   replaceProductImage,
+  getProductImagePath,
   removeProductImages,
 } = require("../services/product-image.service");
 
-const serializeProduct = (product) => {
+const serializeProduct = async (product, req) => {
   const result = product.toObject();
   delete result.image;
+  const imagePath = await getProductImagePath(product);
+  result.imageUrl = imagePath
+    ? `${req.protocol}://${req.get("host")}${imagePath}`
+    : null;
   return result;
 };
 
@@ -27,7 +32,7 @@ const getAllProducts = async (req, res) => {
       status: 200,
       message: "Product list retrieved successfully",
       data: {
-        products: products.map(serializeProduct),
+        products: await Promise.all(products.map((product) => serializeProduct(product, req))),
       }
     });
 
@@ -54,7 +59,7 @@ const getProductById = async (req, res) => {
       status: 200,
       message: "Product list retrieved successfully",
       data: {
-        product: serializeProduct(product),
+        product: await serializeProduct(product, req),
       }
     });
 
@@ -87,13 +92,14 @@ const createProduct = async (req, res) => {
       ownerId,
     });
 
-    await replaceProductImage(product._id, req.file);
+    const imagePath = await replaceProductImage(product._id, req.file);
+    if (imagePath) product.image = imagePath;
 
     return res.status(201).json({
       status: 201,
       message: "Product added successfully",
       data: {
-        product: serializeProduct(product),
+        product: await serializeProduct(product, req),
       }
     });
 
@@ -129,13 +135,14 @@ const updateProduct = async (req, res) => {
       currentUser
     );
 
-    await replaceProductImage(product._id, req.file);
+    const imagePath = await replaceProductImage(product._id, req.file);
+    if (imagePath) product.image = imagePath;
 
     return res.status(200).json({
       status: 200,
       message: "Product edit successfully",
       data: {
-        product: serializeProduct(product),
+        product: await serializeProduct(product, req),
       }
     });
 

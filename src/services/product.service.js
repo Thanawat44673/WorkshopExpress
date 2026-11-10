@@ -1,13 +1,16 @@
 const Product = require("../models/product.model");
+const Order = require("../models/order.model");
 const mongoose = require("mongoose");
 
 // Get All Products
 const getAllProducts = async (currentUser) => {
   try {
-    // Owner จัดการ/ดูได้เฉพาะสินค้าของร้านตัวเอง ส่วน User ยังดูสินค้าสำหรับซื้อได้
+    // Owner เห็นสินค้าทุกสถานะของร้านเพื่อจัดการได้ ส่วนผู้ซื้อเห็นเฉพาะสินค้าพร้อมขาย
     const filter = currentUser?.role === "owner"
-      ? { owner: currentUser.id, isActive: true, stock: { $gt: 0 } }
-      : { isActive: true, stock: { $gt: 0 } };
+      ? { owner: currentUser.id }
+      : currentUser?.role === "admin"
+        ? {}
+        : { isActive: true, stock: { $gt: 0 } };
 
     const products = await Product.find(filter)
       .populate("owner", "username")
@@ -32,14 +35,13 @@ const getProductById = async (productId, currentUser) => {
     }
 
     // 2. ค้นหาสินค้าจาก MongoDB
-    const filter = {
-      _id: productId,
-      isActive: true,
-      stock: { $gt: 0 },
-    };
+    const filter = { _id: productId };
 
     if (currentUser?.role === "owner") {
       filter.owner = currentUser.id;
+    } else if (currentUser?.role !== "admin") {
+      filter.isActive = true;
+      filter.stock = { $gt: 0 };
     }
 
     const product = await Product.findOne(filter).populate("owner", "username");
@@ -240,8 +242,34 @@ const updateProduct = async (productId, updateData, currentUser) => {
       product.isActive = stock > 0;
     }
 
+    const syncOrderSnapshot =
+      product.isModified("name") || product.isModified("price");
+
     //* 10. บันทึกข้อมูล
     await product.save();
+
+    if (syncOrderSnapshot) {
+      const relatedOrders = await Order.find({ product: product._id })
+        .select("_id quantity")
+        .lean();
+
+      if (relatedOrders.length > 0) {
+        await Order.bulkWrite(
+          relatedOrders.map((order) => ({
+            updateOne: {
+              filter: { _id: order._id },
+              update: {
+                $set: {
+                  productName: product.name,
+                  unitPrice: product.price,
+                  totalPrice: product.price * order.quantity,
+                },
+              },
+            },
+          }))
+        );
+      }
+    }
 
     //* 11. ดึงข้อมูลเจ้าของสินค้า
     await product.populate("owner", "username");
