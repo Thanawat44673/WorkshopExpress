@@ -2,13 +2,14 @@ const Product = require("../models/product.model");
 const mongoose = require("mongoose");
 
 // Get All Products
-const getAllProducts = async () => {
+const getAllProducts = async (currentUser) => {
   try {
-    // 1. ค้นหาสินค้าที่ยังเปิดใช้งาน
-    const products = await Product.find({
-      isActive: true,
-      stock: { $gt: 0 },
-    })
+    // Owner จัดการ/ดูได้เฉพาะสินค้าของร้านตัวเอง ส่วน User ยังดูสินค้าสำหรับซื้อได้
+    const filter = currentUser?.role === "owner"
+      ? { owner: currentUser.id, isActive: true, stock: { $gt: 0 } }
+      : { isActive: true, stock: { $gt: 0 } };
+
+    const products = await Product.find(filter)
       .populate("owner", "username")
       .sort({ createdAt: -1 });
 
@@ -21,7 +22,7 @@ const getAllProducts = async () => {
 };
 
 // Get Product By ID
-const getProductById = async (productId) => {
+const getProductById = async (productId, currentUser) => {
   try {
     // 1. ตรวจสอบรูปแบบ Product ID
     if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -31,11 +32,17 @@ const getProductById = async (productId) => {
     }
 
     // 2. ค้นหาสินค้าจาก MongoDB
-    const product = await Product.findOne({
+    const filter = {
       _id: productId,
       isActive: true,
       stock: { $gt: 0 },
-    }).populate("owner", "username");
+    };
+
+    if (currentUser?.role === "owner") {
+      filter.owner = currentUser.id;
+    }
+
+    const product = await Product.findOne(filter).populate("owner", "username");
 
     // 3. ตรวจสอบว่าพบสินค้าหรือไม่
     if (!product) {

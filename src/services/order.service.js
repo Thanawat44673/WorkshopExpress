@@ -54,18 +54,14 @@ const getAllOrders = async (currentUser) => {
         //* 1. กำหนดเงื่อนไขการค้นหา Order
         let filter = {};
 
-        //* 2. ตรวจสอบสิทธิ์ Admin
+        //* 2. จำกัดข้อมูลตามบทบาท: Admin ดูทั้งหมด, Owner ดูออเดอร์ร้านตัวเอง,
+        //*    User ดูออเดอร์ที่ตนเป็นผู้ซื้อ
         if (currentUser.role === "admin") {
-            // Admin สามารถดู Order ทั้งหมดได้
             filter = {};
+        } else if (currentUser.role === "owner") {
+            filter = { owner: currentUser.id };
         } else {
-            //* 3. User และ Owner ดูเฉพาะ Order ที่เกี่ยวข้องกับตัวเอง
-            filter = {
-                $or: [
-                    { buyer: currentUser.id },
-                    { owner: currentUser.id },
-                ],
-            };
+            filter = { buyer: currentUser.id };
         }
 
         //* 4. ค้นหา Order ตามเงื่อนไข

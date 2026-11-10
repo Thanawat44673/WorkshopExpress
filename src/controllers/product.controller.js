@@ -13,7 +13,7 @@ const serializeProduct = (product) => {
 // GET All Products
 const getAllProducts = async (req, res) => {
   try {
-    const products = await productService.getAllProducts();
+    const products = await productService.getAllProducts(req.user);
 
     if (products.length === 0) {
       return res.status(404).json({
@@ -48,7 +48,7 @@ const getProductById = async (req, res) => {
     // รับ Product ID จาก URL Parameters
     const { id } = req.params;
 
-    const product = await productService.getProductById(id);
+    const product = await productService.getProductById(id, req.user);
 
     return res.status(200).json({
       status: 200,
